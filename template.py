@@ -42,4 +42,4 @@ for filepath in files_to_make:
             pass
             logging.info(f"Creating empty file: {filepath}")
     else:
-        logging.info(f"File already exists: {filepath}  ")
+        logging.info(f"File already exists: {filepath}")
