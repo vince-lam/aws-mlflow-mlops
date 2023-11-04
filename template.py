@@ -1,6 +1,7 @@
-import os
-from pathlib import Path
 import logging
+import os
+import typing
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s]: %(message)s:")
 
@@ -30,16 +31,36 @@ files_to_make = [
     "templates/index.html",
 ]
 
-for filepath in files_to_make:
-    filepath = Path(filepath)
-    filedir, filename = os.path.split(filepath)
 
-    if filedir != "":
-        os.makedirs(filedir, exist_ok=True)
-        logging.info(f"Creating directory: {filedir} for file: {filename}")
-    if (not os.path.exists(filepath)) or (os.path.getsize(filepath) == 0):
-        with open(filepath, "w") as f:
-            pass
+def create_files(files_to_make: typing.List[str]) -> None:
+    """
+    Create directories and empty files based on a list of file paths.
+
+    This function takes a list of file paths and creates the necessary directories
+    and empty files. If the file already exists, it is left unchanged.
+
+    Parameters:
+    files_to_make (list[str]): A list of strings representing the file paths for which
+                               directories and files should be created.
+
+    Returns:
+    None
+    """
+    for filepath_str in files_to_make:
+        filepath = Path(filepath_str)
+        filedir, filename = os.path.split(filepath)
+
+        if filedir != "":
+            os.makedirs(filedir, exist_ok=True)
+            logging.info(f"Creating directory: {filedir} for file: {filename}")
+
+        if not filepath.exists() or filepath.stat().st_size == 0:
+            with open(filepath, "w") as f:
+                pass
             logging.info(f"Creating empty file: {filepath}")
-    else:
-        logging.info(f"File already exists: {filepath}")
+        else:
+            logging.info(f"File already exists: {filepath}")
+
+
+if __name__ == "__main__":
+    create_files(files_to_make)
