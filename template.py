@@ -31,7 +31,7 @@ files_to_make = [
 ]
 
 for filepath in files_to_make:
-    filepath = Path(filepath)
+    filepath = Path(filepath: str)
     filedir, filename = os.path.split(filepath)
 
     if filedir != "":
