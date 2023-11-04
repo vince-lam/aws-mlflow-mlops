@@ -7,16 +7,12 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v2
 
-      - name: Python Linter
-        uses: sunnysid3up/python-linter@v0.1-beta.7
-        additional_dependencies: ["click==8.0.2"]
-
+      - uses: psf/black@stable
         with:
-          #source: "src"
-          mypy-options: "--ignore-missing-imports --show-error-codes"
-          #pylint-options: "--rcfile=setup.cfg"
-          #isort-options: "-w 100"
-  
+          jupyter: true
+
+      - uses: isort/isort-action@v1
+
       - name: commit isort changes
         run: |
           git config --local user.email "action@github.com"
@@ -28,3 +24,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+
+      - run: pip install mypy
+      - run: mypy --ignore-missing-imports .
