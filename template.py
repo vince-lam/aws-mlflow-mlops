@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import logging
+import typing
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s]: %(message)s:")
 
@@ -31,7 +32,7 @@ files_to_make = [
 ]
 
 
-def create_files(files_to_make: list[str]) -> None:
+def create_files(files_to_make: typing.List[str]) -> None:
     """
     Create directories and empty files based on a list of file paths.
 
