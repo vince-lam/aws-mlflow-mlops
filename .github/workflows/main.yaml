@@ -9,6 +9,8 @@ jobs:
 
       - name: Python Linter
         uses: sunnysid3up/python-linter@v0.1-beta.7
+        additional_dependencies: ["click==8.0.2"]
+
         with:
           #source: "src"
           mypy-options: "--ignore-missing-imports --show-error-codes"
