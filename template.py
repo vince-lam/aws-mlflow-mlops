@@ -5,7 +5,7 @@ from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="[%(asctime)s]: %(message)s:")
 
-project_name = "aws-mlflow-mlops"
+project_name = "aws_mlflow_mlops"
 
 files_to_make = [
     ".github/workflows/.gitkeep",
