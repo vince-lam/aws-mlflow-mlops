@@ -31,15 +31,15 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
             yaml_config = yaml.safe_load(yaml_file)
             logger.info(f"yaml file: {path_to_yaml} loaded successfully")
         return ConfigBox(yaml_config)
-    except FileNotFoundError as e:
-        logger.error(f"FileNotFoundError: {e}")
-        raise e
-    except BoxValueError as e:
-        logger.error(f"BoxValueError: {e}")
-        raise e
-    except Exception:
+    except FileNotFoundError as file_error:
+        logger.error(f"FileNotFoundError: {file_error}")
+        raise file_error
+    except BoxValueError as box_error:
+        logger.error(f"BoxValueError: {box_error}")
+        raise box_error
+    except Exception as error:
         logger.error(f"Unexpected error while reading yaml file: {path_to_yaml}")
-        raise e
+        raise error
 
 
 @ensure_annotations
