@@ -1,11 +1,11 @@
 import os
 import urllib.request as request
 import zipfile
+from pathlib import Path
 
 from src.aws_mlflow_mlops import logger
-from src.aws_mlflow_mlops.utils.common import get_size
 from src.aws_mlflow_mlops.entity.config_entity import DataIngestionConfig
-from pathlib import Path
+from src.aws_mlflow_mlops.utils.common import get_size
 
 
 class DataIngestion:
