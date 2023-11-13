@@ -26,4 +26,4 @@ jobs:
           branch: ${{ github.ref }}
 
       - run: pip install mypy
-      - run: mypy --ignore-missing-imports .
+      - run: mypy --no-namespace-packages .
