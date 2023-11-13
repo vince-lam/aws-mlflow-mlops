@@ -27,23 +27,18 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
         ConfigBox: ConfigBox object.
     """
     try:
-        with open(path_to_yaml, "r") as yaml_file:
-            yaml_config = yaml.safe_load(yaml_file)
+        with open(path_to_yaml) as yaml_file:
+            content = yaml.safe_load(yaml_file)
             logger.info(f"yaml file: {path_to_yaml} loaded successfully")
-        return ConfigBox(yaml_config)
-    except FileNotFoundError as file_error:
-        logger.error(f"FileNotFoundError: {file_error}")
-        raise file_error
-    except BoxValueError as box_error:
-        logger.error(f"BoxValueError: {box_error}")
-        raise box_error
-    except Exception as error:
-        logger.error(f"Unexpected error while reading yaml file: {path_to_yaml}")
-        raise error
+            return ConfigBox(content)
+    except BoxValueError:
+        raise ValueError("yaml file is empty")
+    except Exception as e:
+        raise e
 
 
 @ensure_annotations
-def create_directories(path_to_directories: list, verbose: bool = True) -> None:
+def create_directories(path_to_directories: list) -> str:
     """
     Create directories from a list of directory paths.
 
@@ -58,12 +53,12 @@ def create_directories(path_to_directories: list, verbose: bool = True) -> None:
                     Defaults to True, meaning that logging is enabled.
 
     Returns:
-    None
+    str: A string indicating that the directories have been created.
     """
     for path in path_to_directories:
         os.makedirs(path, exist_ok=True)
-        if verbose:
-            logger.info(f"Directory created: {path}")
+        logger.info(f"created directory at: {path}")
+    return f"created {len(path_to_directories)} directories"
 
 
 @ensure_annotations
@@ -106,7 +101,7 @@ def load_json(path: Path) -> ConfigBox:
     with open(path) as f:
         content = json.load(f)
 
-    logger.info(f"JSON file loaded from: {path}")
+    logger.info(f"json file loaded succesfully from: {path}")
     return ConfigBox(content)
 
 
