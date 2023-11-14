@@ -1,7 +1,6 @@
-from src.aws_mlflow_mlops.config.configuration import ConfigurationManager
-from src.aws_mlflow_mlops.components.data_ingestion import DataIngestion
 from src.aws_mlflow_mlops import logger
-
+from src.aws_mlflow_mlops.components.data_ingestion import DataIngestion
+from src.aws_mlflow_mlops.config.configuration import ConfigurationManager
 
 STAGE_NAME = "Data Ingestion Stage"
 
