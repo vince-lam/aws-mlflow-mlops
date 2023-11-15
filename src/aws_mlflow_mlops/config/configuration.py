@@ -1,9 +1,10 @@
 from src.aws_mlflow_mlops.constants import *
-from src.aws_mlflow_mlops.utils.common import read_yaml, create_directories
 from src.aws_mlflow_mlops.entity.config_entity import (
     DataIngestionConfig,
+    DataTransformationConfig,
     DataValidationConfig,
 )
+from src.aws_mlflow_mlops.utils.common import create_directories, read_yaml
 
 
 class ConfigurationManager:
@@ -80,3 +81,25 @@ class ConfigurationManager:
         )
 
         return data_validation_config
+
+    def get_data_transformation_config(self) -> DataTransformationConfig:
+        """
+        The method to get the data transformation configuration.
+
+        This method retrieves the data transformation configuration from the main configuration object,
+        creates a DataTransformationConfig instance with the root directory and data path from the configuration,
+        and returns this instance.
+
+        Returns:
+            DataTransformationConfig: An instance of DataTransformationConfig with the root directory and data path from the configuration.
+        """
+        config = self.config.data_transformation
+
+        create_directories([config.root_dir])
+
+        data_transformation_config = DataTransformationConfig(
+            root_dir=config.root_dir,
+            data_path=config.data_path,
+        )
+
+        return data_transformation_config
