@@ -8,6 +8,9 @@ from src.aws_mlflow_mlops.pipeline.stage_02_data_validation import (
 from src.aws_mlflow_mlops.pipeline.stage_03_data_transformation import (
     DataTransformationTrainingPipeline,
 )
+from src.aws_mlflow_mlops.pipeline.stage_04_model_trainer import (
+    ModelTrainerTrainingPipeline,
+)
 
 STAGE_NAME = "Data Ingestion Stage"
 try:
@@ -37,4 +40,14 @@ try:
     logger.info(f"Completed {STAGE_NAME}\n\n")
 except Exception as e:
     logger.exception(e)
+    raise e
+
+STAGE_NAME = "Model Training Stage"
+try:
+    logger.info(f"Starting {STAGE_NAME}")
+    pipeline = ModelTrainerTrainingPipeline()
+    pipeline.main()
+    logger.info(f"Completed {STAGE_NAME}")
+except Exception as e:
+    logger.error(f"Failed to complete {STAGE_NAME} with error: {e}")
     raise e
