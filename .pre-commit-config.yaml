@@ -12,12 +12,10 @@ repos:
         exclude: "notebooks"
 
 -   repo: https://github.com/psf/black
-    rev: 21.10b0
+    rev: 23.11.0
     hooks:
     -   id: black
-        args: [--safe]
         files: .
-        additional_dependencies: [click==7.1.2]
 
 -   repo: https://github.com/pycqa/isort
     rev: 5.12.0
