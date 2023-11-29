@@ -25,8 +25,6 @@ files_to_make = [
     "main.py",
     "app.py",
     "Dockerfile",
-    "requirements.txt",
-    "setup.py",
     "notebooks/experiments.ipynb",
     "templates/index.html",
 ]
@@ -34,16 +32,17 @@ files_to_make = [
 
 def create_files(files_to_make: typing.List[str]) -> None:
     """
-    Create directories and empty files based on a list of file paths.
+    Creates directories and files based on the provided list of file paths.
 
-    This function takes a list of file paths and creates the necessary directories
-    and empty files. If the file already exists, it is left unchanged.
+    Parameters
+    ----------
+    files_to_make : List[str]
+        A list of file paths to create. Each file path can include directories and a file name.
+        Directories are created if they don't exist. Files are created as empty files if they
+        don't exist or if they exist but are empty.
 
-    Parameters:
-    files_to_make (list[str]): A list of strings representing the file paths for which
-                               directories and files should be created.
-
-    Returns:
+    Returns
+    -------
     None
     """
     for filepath_str in files_to_make:
@@ -55,7 +54,7 @@ def create_files(files_to_make: typing.List[str]) -> None:
             logging.info(f"Creating directory: {filedir} for file: {filename}")
 
         if not filepath.exists() or filepath.stat().st_size == 0:
-            with open(filepath, "w") as f:
+            with open(filepath, "w"):
                 pass
             logging.info(f"Creating empty file: {filepath}")
         else:
