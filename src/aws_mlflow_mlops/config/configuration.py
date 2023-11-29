@@ -10,15 +10,21 @@ from src.aws_mlflow_mlops.entity.config_entity import (
     DataIngestionConfig,
     DataTransformationConfig,
     DataValidationConfig,
+    ModelEvaluationConfig,
     ModelTrainerConfig,
 )
-from src.aws_mlflow_mlops.utils.common import create_directories, read_yaml
+from src.aws_mlflow_mlops.utils.common import (
+    create_directories,
+    get_mlflow_tracking_uri,
+    read_yaml,
+)
 
 
 class ConfigurationManager:
     """
-    The ConfigurationManager class is responsible for managing the configuration of the data ingestion process.
-    It reads configuration, parameters, and schema from YAML files, and creates necessary directories.
+    The ConfigurationManager class is responsible for managing the configuration of the data
+    ingestion process. It reads configuration, parameters, and schema from YAML files, and creates
+    necessary directories.
 
     Attributes:
         config (dict): Configuration read from a YAML file.
@@ -51,7 +57,7 @@ class ConfigurationManager:
         The method to get the configuration for the data ingestion process.
 
         Returns:
-            DataIngestionConfig: An object containing the configuration for the data ingestion process.
+            DataIngestionConfig: An object containing the configuration for data ingestion process.
         """
         config = self.config["data_ingestion"]
 
@@ -74,7 +80,7 @@ class ConfigurationManager:
         creates necessary directories, and returns a DataValidationConfig object.
 
         Returns:
-            DataValidationConfig: An object containing the configuration for the data validation process.
+            DataValidationConfig: An object containing configuration for data validation process.
         """
         config = self.config["data_validation"]
         schema = self.schema["COLUMNS"]
@@ -94,12 +100,13 @@ class ConfigurationManager:
         """
         The method to get the data transformation configuration.
 
-        This method retrieves the data transformation configuration from the main configuration object,
-        creates a DataTransformationConfig instance with the root directory and data path from the configuration,
-        and returns this instance.
+        This method retrieves the data transformation configuration from the main configuration
+        object, creates a DataTransformationConfig instance with the root directory and data path
+        from the configuration, and returns this instance.
 
         Returns:
-            DataTransformationConfig: An instance of DataTransformationConfig with the root directory and data path from the configuration.
+            DataTransformationConfig: An instance of DataTransformationConfig with the root
+            directory and data path from the configuration.
         """
         config = self.config["data_transformation"]
 
@@ -119,13 +126,14 @@ class ConfigurationManager:
         This method retrieves the model trainer configuration from the main configuration object,
         the ElasticNet parameters, and the target column schema.
         It creates the directories for the root directory in the configuration if they do not exist,
-        creates a ModelTrainerConfig instance with the root directory, train data path, test data path, model name,
-        alpha, l1_ratio, and target column name from the configuration, parameters, and schema,
-        and returns this instance.
+        creates a ModelTrainerConfig instance with the root directory, train data path, test data
+        path, model name, alpha, l1_ratio, and target column name from the configuration,
+        parameters, and schema,and returns this instance.
 
         Returns:
-            ModelTrainerConfig: An instance of ModelTrainerConfig with the root directory, train data path, test data path,
-            model name, alpha, l1_ratio, and target column name from the configuration, parameters, and schema.
+            ModelTrainerConfig: An instance of ModelTrainerConfig with the root directory, train
+            data path, test data path, model name, alpha, l1_ratio, and target column name from the
+            configuration, parameters, and schema.
         """
         config = self.config["model_trainer"]
         params = self.params["ElasticNet"]
@@ -144,3 +152,35 @@ class ConfigurationManager:
         )
 
         return model_trainer_config
+
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        """
+        Retrieve the configuration for model evaluation.
+
+        This method fetches the model evaluation configuration, ElasticNet parameters, and the
+        target column schema from the instance's attributes. It creates necessary directories
+        specified in the config and constructs a ModelEvaluationConfig object with the retrieved
+        and processed information.
+
+        Returns:
+        ModelEvaluationConfig: An object containing the root directory, test data path, model path,
+        ElasticNet parameters, metric file name, target column name, and MLflow URI for evaluation.
+        """
+        config = self.config["model_evaluation"]
+        params = self.params["ElasticNet"]
+        schema = self.schema["TARGET_COLUMN"]
+        mlflow_tracking_uri = get_mlflow_tracking_uri()
+
+        create_directories([config["root_dir"]])
+
+        model_evaluation_config = ModelEvaluationConfig(
+            root_dir=config["root_dir"],
+            test_data_path=config["test_data_path"],
+            model_path=config["model_path"],
+            all_params=params,
+            metric_file_name=config["metric_file_name"],
+            target_column=schema["name"],
+            mlflow_uri=mlflow_tracking_uri,
+        )
+
+        return model_evaluation_config

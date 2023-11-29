@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Optional
 
 import joblib
 import yaml
@@ -43,12 +43,12 @@ def create_directories(path_to_directories: list) -> str:
     Create directories from a list of directory paths.
 
     This function iterates over a list of directory paths and creates each directory.
-    If the directory already exists, it is not created again. This function can optionally
-    log a message for each directory it creates.
+    If the directory already exists, it is not created again. This function can
+    optionally log a message for each directory it creates.
 
     Parameters:
-    path_to_directories (list): A list of strings, where each string is a path to a directory
-                                that needs to be created.
+    path_to_directories (list): A list of strings, where each string is a path to a
+                                directory that needs to be created.
     verbose (bool): A flag that indicates whether to log the creation of directories.
                     Defaults to True, meaning that logging is enabled.
 
@@ -61,22 +61,29 @@ def create_directories(path_to_directories: list) -> str:
     return f"created {len(path_to_directories)} directories"
 
 
-@ensure_annotations
-def save_json(path: Path, data: dict) -> None:
+def save_json(path: Path, data: Dict) -> None:
     """
     Save a dictionary to a JSON file.
 
     This function takes a dictionary and saves it to the specified path as a JSON file.
     The JSON file is formatted with an indentation of 4 spaces for readability. If the
-    function successfully saves the file, it logs an informational message with the file's path.
+    function successfully saves the file, it logs an informational message with the
+    file's path.
 
     Parameters:
-    path (Path): A Path object representing the file path where the JSON data will be saved.
+    path (Path): A Path object of the file path where the JSON data will be saved.
     data (dict): The dictionary data to be saved to a JSON file.
 
     Returns:
     None
     """
+    assert isinstance(path, Path), "path must be a Path object"
+    assert isinstance(data, dict), "data must be a dict"
+    if data:
+        key = next(iter(data))
+        assert isinstance(key, str), "keys in data must be str"
+        assert isinstance(data[key], float), "values in data must be float"
+
     with open(path, "w") as f:
         json.dump(data, f, indent=4)
 
@@ -88,12 +95,13 @@ def load_json(path: Path) -> ConfigBox:
     """
     Load a JSON file and return its content as a ConfigBox object.
 
-    This function opens a JSON file, reads its content, and converts it into a ConfigBox object,
-    which allows attribute-style access to the dictionary values. After loading the file, it logs
-    a message with the file's path.
+    This function opens a JSON file, reads its content, and converts it into a
+    ConfigBox object, which allows attribute-style access to the dictionary values.
+    After loading the file, it logs a message with the file's path.
 
     Parameters:
-    path (Path): A Path object representing the file path from where the JSON data will be loaded.
+    path (Path): A Path object representing the file path from where the JSON data will
+                 be loaded.
 
     Returns:
     ConfigBox: A ConfigBox object containing the data loaded from the JSON file.
@@ -111,13 +119,13 @@ def save_bin(data: Any, path: Path) -> None:
     Save data to a binary file using joblib.
 
     This function serializes any Python object ('data') and saves it to a specified path
-    using joblib's dump function, which is particularly useful for saving large numpy arrays
-    or models efficiently. It also logs an informational message indicating where the file
-    has been saved.
+    using joblib's dump function, which is particularly useful for saving large numpy
+    arrays or models efficiently. It also logs an informational message indicating where
+    the file has been saved.
 
     Parameters:
-    data (Any): The data to be saved. This can be any Python object serializable by joblib.
-    path (Path): A Path object representing the file path where the binary data will be saved.
+    data (Any): The data to be saved, can be any Python object serializable by joblib.
+    path (Path): A Path object for the file path where the binary data will be saved.
 
     Returns:
     None
@@ -131,12 +139,14 @@ def load_bin(path: Path) -> Any:
     """
     Load data from a binary file using joblib.
 
-    This function deserializes data from a binary file located at the given path using joblib's
-    load function. It can deserialize any object saved with joblib's dump function. After loading
-    the data, it logs an informational message indicating the source of the data.
+    This function deserializes data from a binary file located at the given path using
+    joblib's load function. It can deserialize any object saved with joblib's dump
+    function. After loading the data, it logs an informational message indicating the
+    source of the data.
 
     Parameters:
-    path (Path): A Path object representing the file path from where the binary data will be loaded.
+    path (Path): A Path object representing the file path from where the binary data
+                 will be loaded.
 
     Returns:
     Any: The deserialized Python object from the binary file.
@@ -146,6 +156,7 @@ def load_bin(path: Path) -> Any:
     return data
 
 
+@ensure_annotations
 def get_size(path: Path) -> str:
     """
     Calculate the size of a file in kilobytes.
@@ -154,10 +165,32 @@ def get_size(path: Path) -> str:
     rounded to the nearest kilobyte. It returns the size as a string.
 
     Parameters:
-    path (Path): A Path object representing the file path whose size is to be calculated.
+    path (Path): A Path object for the file path whose size is to be calculated.
 
     Returns:
     str: A string representing the file size in kilobytes, formatted as '~ XX KB'.
     """
     size_in_kb = round(os.path.getsize(path) / 1024)
     return f"~ {size_in_kb} KB"
+
+
+@ensure_annotations
+def get_mlflow_tracking_uri() -> Optional[str]:
+    """
+    Get the MLflow tracking URI from the .env file.
+
+    This function reads the MLflow tracking URI from the .env file and returns it as a
+    string. If the .env file does not exist, it returns None.
+
+    Returns:
+    Optional[str]: A string containing the MLflow tracking URI, or None if the .env file does not exist.
+    """
+    try:
+        with open(".env") as f:
+            for line in f:
+                if line.startswith("MLFLOW_TRACKING_URI"):
+                    return line.split("=")[1].strip()
+    except FileNotFoundError:
+        return None
+
+    return None
