@@ -16,16 +16,72 @@ from aws_mlflow_mlops.utils.common import save_json
 
 
 class ModelEvaluation:
+    """
+    A class used to evaluate a trained model and log the results into MLflow.
+
+    ...
+
+    Attributes
+    ----------
+    config : ModelEvaluationConfig
+        The configuration settings for model evaluation.
+
+    Methods
+    -------
+    evaluation_metrics(actual, pred):
+        Calculates and returns the RMSE, MAE, and R2 score of the model predictions.
+
+    log_into_mlflow():
+        Loads the test data and the trained model, makes predictions on the test data, calculates
+        evaluation metrics, and logs the results into MLflow.
+    """
+
     def __init__(self, config: ModelEvaluationConfig):
+        """
+        Constructs all the necessary attributes for the ModelEvaluation object.
+
+        Parameters
+        ----------
+            config : ModelEvaluationConfig
+                The configuration settings for model evaluation.
+        """
         self.config = config
 
     def evaluation_metrics(self, actual, pred):
+        """
+        Calculates and returns the RMSE, MAE, and R2 score of the model predictions.
+
+        Parameters
+        ----------
+            actual : array-like
+                The actual target values.
+
+            pred : array-like
+                The predicted target values.
+
+        Returns
+        -------
+            rmse : float
+                The Root Mean Square Error of the model predictions.
+
+            mae : float
+                The Mean Absolute Error of the model predictions.
+
+            r2 : float
+                The R2 score of the model predictions.
+        """
         rmse = np.sqrt(mean_squared_error(actual, pred))
         mae = mean_absolute_error(actual, pred)
         r2 = r2_score(actual, pred)
         return rmse, mae, r2
 
     def log_into_mlflow(self):
+        """
+        Loads the test data and the trained model, makes predictions on the test data, calculates
+        evaluation metrics, and logs the results into MLflow.
+
+        This method also saves the evaluation metrics locally as a JSON file.
+        """
         load_dotenv()
 
         # Load test data and model
@@ -51,10 +107,7 @@ class ModelEvaluation:
             print(scores)
             save_json(path=Path(self.config.metric_file_name), data=scores)
 
-            print(
-                "Elasticnet model (alpha=%f, l1_ratio=%f):"
-                % (model.alpha, model.l1_ratio)
-            )
+            print("Elasticnet model (alpha=%f, l1_ratio=%f):" % (model.alpha, model.l1_ratio))
             print("  RMSE: %s" % rmse)
             print("  MAE: %s" % mae)
             print("  R2: %s" % r2)
@@ -67,8 +120,6 @@ class ModelEvaluation:
 
             # Model registry does not work with file store
             if tracking_url_type_store != "file":
-                mlflow.sklearn.log_model(
-                    model, "model", registered_model_name="ElasticnetModel"
-                )
+                mlflow.sklearn.log_model(model, "model", registered_model_name="ElasticnetModel")
             else:
                 mlflow.sklearn.log_model(model, "model")
